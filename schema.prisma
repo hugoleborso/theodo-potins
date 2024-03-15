@@ -1,0 +1,47 @@
+// schema.prisma
+
+datasource db {
+    provider = "postgres"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider             = "prisma-client-py"
+    recursive_type_depth = 5
+}
+
+enum StartUp {
+    Theodo
+    TheodoUK
+    TheodoUS
+    BAM
+    Padok
+    Sicara
+    Sipios
+    Hokla
+    Solona
+}
+
+enum Permission {
+    Admin
+    User
+}
+
+model User {
+    email      String     @id @unique
+    password   String
+    firstname  String
+    lastname   String
+    startup    StartUp
+    potins     Potin[]
+    permission Permission
+}
+
+model Potin {
+    id                       Int      @id @default(autoincrement())
+    content                  String
+    author                   User     @relation(fields: [authorEmail], references: [email])
+    authorEmail              String
+    createdAt                DateTime @default(now())
+    concernedUsersGroupEmail String[]
+}
