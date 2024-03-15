@@ -10,18 +10,6 @@ generator client {
     recursive_type_depth = 5
 }
 
-enum StartUp {
-    Theodo
-    TheodoUK
-    TheodoUS
-    BAM
-    Padok
-    Sicara
-    Sipios
-    Hokla
-    Solona
-}
-
 enum Permission {
     Admin
     User
@@ -32,7 +20,6 @@ model User {
     password   String
     firstname  String
     lastname   String
-    startup    StartUp
     potins     Potin[]
     permission Permission
 }

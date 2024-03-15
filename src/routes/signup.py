@@ -2,7 +2,7 @@ from prisma.types import UserCreateInput, _UserWhereUnique_email_Input
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
-from prisma.enums import Permission, StartUp
+from prisma.enums import Permission
 from passlib.context import CryptContext  # type: ignore
 
 
@@ -18,7 +18,6 @@ class Signup(BaseModel):
     email: str
     firstname: str
     lastname: str
-    startup: StartUp
 
 
 def hash_password(password: str) -> str:
@@ -44,7 +43,6 @@ async def sign_up(signup_data: Signup):
                 firstname=signup_data.firstname,
                 lastname=signup_data.lastname,
                 permission=Permission.User,
-                startup=signup_data.startup,
                 password=hashed_password,
             )
         )
