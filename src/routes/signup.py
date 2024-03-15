@@ -18,6 +18,18 @@ class Signup(BaseModel):
     email: str
     firstname: str
     lastname: str
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "password": "Your password",
+                    "email": "hugobo@theodo.fr",
+                    "firstname": "Hugo",
+                    "lastname": "Borsoni",
+                }
+            ]
+        }
+    }
 
 
 def hash_password(password: str) -> str:

@@ -1,6 +1,6 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends
-from prisma.models import Potin, User
+from prisma.models import User
 
 from prisma.types import (
     PotinCreateInput,
@@ -11,24 +11,65 @@ from pydantic import BaseModel
 from infra.prisma import getPrisma  # type: ignore
 from routes.auth.utils import check_user  # type: ignore
 
+
+class PotinOut(BaseModel):
+    id: int
+    content: str
+    concernedUsersGroupEmail: list[str]
+    authorEmail: str
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "content": "Je crois que les CEO de Theodo et Sipios sont en couple ...",
+                    "concernedUsersGroupEmail": [
+                        "carolines@theodo.fr",
+                        "woodyr@sipios.fr",
+                    ],
+                    "authorEmail": "hugobo@theodo.fr",
+                }
+            ]
+        }
+    }
+
+
+class PotinInfos(BaseModel):
+    content: str
+    concernedUsersGroupEmail: list[str]
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "content": "Je crois que les CEO de Theodo et Sipios sont en couple ...",
+                    "concernedUsersGroupEmail": [
+                        "carolines@theodo.fr",
+                        "woodyr@sipios.fr",
+                    ],
+                }
+            ]
+        }
+    }
+
+
 potins_router = APIRouter(prefix="/potins", tags=["potins"])
 prisma = getPrisma()
 
 
 @potins_router.get(
-    "", response_model=List[Potin], response_model_exclude_none=True
+    "",
+    response_model=List[PotinOut],
+    response_model_exclude_none=True,
 )
 async def get_all_potins():
     potins = await prisma.potin.find_many()
     return potins
 
 
-class PotinInfos(BaseModel):
-    content: str
-    concernedUsersGroupEmail: list[str]
-
-
-@potins_router.post("", response_model=Potin, response_model_exclude_none=True)
+@potins_router.post(
+    "",
+    response_model=PotinOut,
+    response_model_exclude_none=True,
+)
 async def create_potin(
     potin: PotinInfos,
     user: Annotated[User, Depends(check_user)],
@@ -45,7 +86,9 @@ async def create_potin(
 
 
 @potins_router.put(
-    "/{potin_id}", response_model=Potin, response_model_exclude_none=True
+    "/{potin_id}",
+    response_model=PotinOut,
+    response_model_exclude_none=True,
 )
 async def update_potin(
     potin_id: int,
