@@ -51,10 +51,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router)
-app.include_router(signup_router)
 app.include_router(potins_router)
 app.include_router(users_router)
+app.include_router(signup_router)
+app.include_router(auth_router)
 
 
 @app.on_event("startup")

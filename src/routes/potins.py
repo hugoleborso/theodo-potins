@@ -1,10 +1,10 @@
 from typing import Annotated, List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from prisma.models import User
 
 from prisma.types import (
     PotinCreateInput,
-    PotinWhereUniqueInput,
+    PotinWhereInput,
 )
 from pydantic import BaseModel
 
@@ -51,7 +51,18 @@ class PotinInfos(BaseModel):
     }
 
 
-potins_router = APIRouter(prefix="/potins", tags=["potins"])
+class Message(BaseModel):
+    message: str
+
+
+potins_router = APIRouter(
+    prefix="/potins",
+    tags=["potins"],
+    responses={
+        401: {"description": "Unauthorized"},
+        403: {"description": "Forbidden"},
+    },
+)
 prisma = getPrisma()
 
 
@@ -88,6 +99,9 @@ async def create_potin(
 @potins_router.put(
     "/{potin_id}",
     response_model=PotinOut,
+    responses={
+        404: {"description": "Potin Not found"},
+    },
     response_model_exclude_none=True,
 )
 async def update_potin(
@@ -97,16 +111,35 @@ async def update_potin(
 ):
 
     modified_potin = await prisma.potin.update(
-        where=PotinWhereUniqueInput(id=potin_id),
+        where=PotinWhereInput(id=potin_id, authorEmail=user.email),
         data=PotinCreateInput(
             content=potin.content,
             concernedUsersGroupEmail=potin.concernedUsersGroupEmail,
             authorEmail=user.email,
         ),
     )
+    if not modified_potin:
+        raise HTTPException(status_code=404, detail="Potin not found")
     return modified_potin
 
 
-@potins_router.delete("/{potin_id}")
-async def delete_potin(potin_id: int):
-    await prisma.potin.delete(where=PotinWhereUniqueInput(id=potin_id))
+@potins_router.delete(
+    "/{potin_id}",
+    response_model=PotinOut,
+    responses={
+        404: {"description": "Potin Not found"},
+    },
+    response_model_exclude_none=True,
+)
+async def delete_potin(
+    potin_id: int, user: Annotated[User, Depends(check_user)]
+):
+    deleted_potin = await prisma.potin.delete(
+        where=PotinWhereInput(
+            id=potin_id,
+            authorEmail=user.email,
+        )
+    )
+    if not deleted_potin:
+        raise HTTPException(status_code=404, detail="Potin not found")
+    return deleted_potin
