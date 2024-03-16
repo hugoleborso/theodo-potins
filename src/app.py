@@ -9,6 +9,7 @@ from infra.prisma import prisma
 from routes.auth.auth import auth_router
 from routes.signup import signup_router
 from routes.potins import potins_router
+from routes.users import users_router
 
 
 MODE = os.getenv("MODE", "dev")
@@ -53,6 +54,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(signup_router)
 app.include_router(potins_router)
+app.include_router(users_router)
 
 
 @app.on_event("startup")
