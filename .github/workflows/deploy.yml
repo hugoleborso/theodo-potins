@@ -14,9 +14,7 @@ jobs:
 
       - name: Copy env file
         run: |
-          echo '${{ secrets.BACKEND_ENV }}' > .env
-        env:
-          BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+          echo '${{ secrets.ENV }}' > .env
 
       - name: Copy project files to EC2
         uses: appleboy/scp-action@master
@@ -24,7 +22,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          source: "./backend.Dockerfile, ./prisma-migrate.Dockerfile, ./prisma.Dockerfile, ./docker-compose.yml, ./backend, ./schema.prisma, .env"
+          source: "./backend.Dockerfile, ./prisma-migrate.Dockerfile, ./prisma.Dockerfile, ./docker-compose.yml, ./src, ./migrations, ./requirements.txt, ./schema.prisma, .env"
           target: "/home/ec2-user/vulgatech-postman"
 
       - name: Run docker-compose up
