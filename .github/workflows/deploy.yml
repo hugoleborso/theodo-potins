@@ -34,4 +34,4 @@ jobs:
           script: |
             cd /home/ec2-user/vulgatech-postman
             sudo docker-compose down || true
-            sudo docker-compose up --build -d
+            sudo docker-compose up db backend --build -d
