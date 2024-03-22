@@ -34,7 +34,7 @@ app = FastAPI(
     description="The backend API for Theodo Potins, a mock API created to teach how to use Postamn in Vulgatech.",
     servers=[
         {
-            "url": "http://ec2-35-180-181-45.eu-west-3.compute.amazonaws.com/",
+            "url": "http://ec2-35-180-181-45.eu-west-3.compute.amazonaws.com",
         },
     ],
     version="0.0.1",
