@@ -3,7 +3,6 @@ from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from prisma.types import UserWhereInput
@@ -34,7 +33,7 @@ class Token(BaseModel):
 
 
 @auth_router.post("/login", response_model=Token)
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+async def login(form_data: Annotated[Credentials, Depends()]):
     username = form_data.username
     password = form_data.password
 
