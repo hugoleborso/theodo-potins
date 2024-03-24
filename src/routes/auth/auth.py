@@ -3,6 +3,7 @@ from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from prisma.types import UserWhereInput
@@ -33,7 +34,7 @@ class Token(BaseModel):
 
 
 @auth_router.post("/login", response_model=Token)
-async def login(form_data: Annotated[Credentials, Depends()]):
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     username = form_data.username
     password = form_data.password
 
@@ -41,7 +42,9 @@ async def login(form_data: Annotated[Credentials, Depends()]):
         where=UserWhereInput(email=username)
     )
 
-    if not verify_password(password, current_user.password):
+    if current_user is None or not verify_password(
+        password, current_user.password
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={

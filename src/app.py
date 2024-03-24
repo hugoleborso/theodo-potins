@@ -36,6 +36,9 @@ app = FastAPI(
         {
             "url": "http://ec2-35-180-181-45.eu-west-3.compute.amazonaws.com",
         },
+        {
+            "url": "http://0.0.0.0:8081",
+        },
     ],
     version="0.0.1",
     contact={
@@ -56,10 +59,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 app.include_router(potins_router)
 app.include_router(users_router)
 app.include_router(signup_router)
 app.include_router(auth_router)
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = app.openapi()
+    print(openapi_schema.keys())
+    openapi_schema["components"]["schemas"]["Body_login_login_post"][
+        "examples"
+    ] = [
+        {
+            "username": "hugobo@theodo.fr",
+            "password": "password123!",
+            "scope": "",
+            "grant_type": "password",
+            "client_id": "",
+            "client_secret": "",
+        },
+    ]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+custom_openapi()
 
 
 @app.on_event("startup")
