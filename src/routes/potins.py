@@ -5,6 +5,7 @@ from prisma.models import User
 from prisma.types import (
     PotinCreateInput,
     PotinWhereInput,
+    _StringListFilterHasSomeInput,
 )
 from pydantic import BaseModel
 
@@ -86,11 +87,34 @@ async def get_all_potins():
     "",
     response_model=PotinOut,
     response_model_exclude_none=True,
+    description="Crée un potin, sans acharnement !",
 )
 async def create_potin(
     potin: PotinInfos,
     user: Annotated[User, Depends(check_user)],
 ):
+    already_created_potins = await prisma.potin.find_many(
+        where=PotinWhereInput(
+            authorEmail=user.email,
+            concernedUsersGroupEmail=_StringListFilterHasSomeInput(
+                has_some=potin.concernedUsersGroupEmail
+            ),
+        )
+    )
+
+    if already_created_potins is not None and len(already_created_potins) > 0:
+        users_with_already_created_potins_by_author = set(
+            [
+                user_email
+                for already_created_potin in already_created_potins
+                for user_email in already_created_potin.concernedUsersGroupEmail
+            ]
+        )
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"Pas d'acharnement ! Tu as déjà créé un potin pour des theodoers de ce groupe ! ({', '.join(users_with_already_created_potins_by_author)})",
+        )
 
     created_potin = await prisma.potin.create(
         data=PotinCreateInput(
