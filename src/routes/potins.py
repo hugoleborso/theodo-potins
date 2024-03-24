@@ -11,22 +11,31 @@ from pydantic import BaseModel
 from infra.prisma import getPrisma  # type: ignore
 from routes.auth.utils import check_user  # type: ignore
 
+BASE_POTIN_CONTENT = (
+    "Je crois que la CEO de Theodo et le CTO de Sipios sont en couple ..."
+)
+
+BASE_POTIN_CONCERNED_USERS_GROUP_EMAIL = [
+    "carolines@theodo.fr",
+    "woodyr@sipios.fr",
+]
+
+
+BASE_POTIN_USER = "hugobo@theodo.fr"
+
 
 class PotinOut(BaseModel):
     id: int
     content: str
-    concernedUsersGroupEmail: list[str]
+    concernedUsersGroupEmail: List[str]
     authorEmail: str
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
-                    "content": "Je crois que les CEO de Theodo et Sipios sont en couple ...",
-                    "concernedUsersGroupEmail": [
-                        "carolines@theodo.fr",
-                        "woodyr@sipios.fr",
-                    ],
-                    "authorEmail": "hugobo@theodo.fr",
+                    "content": BASE_POTIN_CONTENT,
+                    "concernedUsersGroupEmail": BASE_POTIN_CONCERNED_USERS_GROUP_EMAIL,  # type: ignore
+                    "authorEmail": BASE_POTIN_USER,
                 }
             ]
         }
@@ -40,11 +49,8 @@ class PotinInfos(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "content": "Je crois que les CEO de Theodo et Sipios sont en couple ...",
-                    "concernedUsersGroupEmail": [
-                        "carolines@theodo.fr",
-                        "woodyr@sipios.fr",
-                    ],
+                    "content": BASE_POTIN_CONTENT,
+                    "concernedUsersGroupEmail": BASE_POTIN_CONCERNED_USERS_GROUP_EMAIL,  # type: ignore
                 }
             ]
         }
